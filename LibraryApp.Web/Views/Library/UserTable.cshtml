@@ -1,0 +1,82 @@
+@model Dictionary<string, List<LibraryApp.Models.User>>
+
+@{
+    ViewData["Title"] = "User List by Type";
+    var userType = Context.Session.GetString("user_type");
+    var username = Context.Session.GetString("username");
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-primary">👥 Registered Users</h2>
+
+    @foreach (var group in Model)
+    {
+        var canEditGroup = (userType == "System Admin") ||
+                           (userType == "Library Officer" && (group.Key == "Library User" || group.Key == "Library Officer"));
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">@group.Key</h5>
+                <span class="badge bg-secondary">@group.Value.Count user(s)</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">Username</th>
+                            @if (canEditGroup)
+                            {
+                                <th scope="col">Authority</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in group.Value)
+                        {
+                            <tr>
+                                <td>@user.FullName</td>
+                                <td>@user.Username</td>
+                                @if (canEditGroup)
+                                {
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <form method="post" asp-controller="Account" asp-action="ChangeUserType" class="m-0">
+                                                <input type="hidden" name="username" value="@user.Username" />
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Change
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        @if (group.Key != "Library User")
+                                                        {
+                                                            <li>
+                                                                <button class="dropdown-item" type="submit" name="newType" value="Library User">Library User</button>
+                                                            </li>
+                                                        }
+                                                        @if (group.Key != "Library Officer")
+                                                        {
+                                                            <li>
+                                                                <button class="dropdown-item" type="submit" name="newType" value="Library Officer">Library Officer</button>
+                                                            </li>
+                                                        }
+                                                        @if (userType == "System Admin" && group.Key != "System Admin")
+                                                        {
+                                                            <li>
+                                                                <button class="dropdown-item" type="submit" name="newType" value="System Admin">System Admin</button>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

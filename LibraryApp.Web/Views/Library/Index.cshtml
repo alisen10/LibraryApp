@@ -1,0 +1,135 @@
+@model List<LibraryApp.Models.Book>
+
+@{
+    ViewData["Title"] = "Library";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string search = ViewBag.Search as string ?? "";
+}
+
+@{
+    var username = Context.Session.GetString("username");
+    var userType = Context.Session.GetString("user_type");
+}
+
+@if (TempData["CannotRemove"] != null)
+{
+    <div id="removeAlert" class="alert alert-danger">
+        @TempData["CannotRemove"]
+    </div>
+
+    <script>
+        setTimeout(function() {
+            var alertBox = document.getElementById('removeAlert');
+            if (alertBox) {
+                alertBox.style.display = 'none';
+            }
+        }, 5000);
+    </script>
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Library Management</h2>
+    
+    @if(userType == "Library Officer"){
+        <div class="d-flex justify-content-center gap-3 mb-4">
+            <a asp-controller="Library" asp-action="AddBook" class="btn btn-primary"> Add Book</a>
+            <a asp-controller="Library" asp-action="RemoveBook" class="btn btn-primary"> Remove Book</a>
+        </div>
+    }
+    
+    <form method="get" asp-action="Index" asp-controller="Library" class="d-flex justify-content-center mb-3">
+        <input type="text" name="search" class="form-control w-50 me-2" placeholder="Search by book name..." value="@search" />
+        <button type="submit" class="btn btn-secondary">Search</button>
+        <a asp-controller="Library" asp-action="Index" class="btn btn-outline-secondary ms-2">Show All</a>
+    </form>
+
+    @if (Model != null && Model.Any())
+    {
+        <div id="kitapListesi">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Explanation</th>
+                        <th>Page Number</th>
+                        <th>Quantity</th>
+                        @if (!string.IsNullOrEmpty(username) && ((userType == "Library Officer")||(userType == "Library User"))){
+                        <th>Operation</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <td>@book.Name</td>
+                        <td>@book.Author</td>
+                        <td>@book.Genre</td>
+                        <td>@book.Expression</td>
+                        <td>@book.Page_number</td>
+                        <td>@book.Quantity</td>
+                        @if (!string.IsNullOrEmpty(username) && (!(userType == "System Admin"))){
+                        <td>
+                            @if (!string.IsNullOrEmpty(username) && (userType == "Library Officer")){
+                            <form method="post" asp-action="RemoveBook" asp-controller="Library">
+                                <input type="hidden" name="name" value="@book.Name" />
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                            <form method="post" asp-action="IncreaseQuantity" asp-controller="Library">
+                                <input type="hidden" name="name" value="@book.Name" />
+                                <button type="submit" class="btn btn-sm btn-danger">Increase</button>
+                            </form>
+                            <form method="post" asp-action="DecreaseQuantity" asp-controller="Library">
+                                <input type="hidden" name="name" value="@book.Name" />
+                                <button type="submit" class="btn btn-sm btn-danger" @(book.Quantity == 0 ? "disabled" : "")>Decrease</button>
+                            </form>
+                            }
+                            @if (!string.IsNullOrEmpty(username) && (userType == "Library User")){
+                            <form method="post" asp-action="BorrowBook" asp-controller="Library">
+                                <input type="hidden" name="bookName" value="@book.Name" />
+                                <button type="submit" class="btn btn-sm btn-danger"@(book.Quantity == 0 ? "disabled" : "")>Borrow</button>
+                            </form>
+                            }
+                            @if (userType == "Library Officer")
+                            {
+                                <form method="get" asp-action="LoanBook" asp-controller="Library">
+                                    <input type="hidden" name="bookName" value="@book.Name" />
+                                    <button type="submit" class="btn btn-sm btn-danger" @(book.Quantity == 0 ? "disabled" : "")>Loan</button>
+                                </form>
+                            }
+
+                        </td>
+                        }
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-search="@search">Previous</a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@search">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-search="@search">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <p class="text-muted text-center">Book is not Found.</p>
+    }
+</div>

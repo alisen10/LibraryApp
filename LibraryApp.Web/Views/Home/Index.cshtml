@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+    string search = ViewBag.Search as string ?? "";
+    var username = Context.Session.GetString("username");
+}
+
+<div class="container my-5">
+    <h2 class="text-center display-4 mb-4">📚 Welcome to Library</h2>
+    @if (!string.IsNullOrEmpty(username))
+    {
+        <form method="get" asp-action="Index" asp-controller="Library" class="d-flex justify-content-center mb-4">
+            <input type="text" name="search" class="form-control w-50 me-2"
+                   placeholder="Search by book name..." value="@search" />
+            <button type="submit" class="btn btn-secondary">Search</button>
+            <a asp-controller="Library" asp-action="Index" class="btn btn-outline-secondary ms-2">Show All</a>
+        </form>
+        
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Fiction" class="btn btn-outline-primary rounded-pill px-4 py-2">Fiction</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Science" class="btn btn-outline-info rounded-pill px-4 py-2">Science</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="History" class="btn btn-outline-warning rounded-pill px-4 py-2">History</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Biography" class="btn btn-outline-dark rounded-pill px-4 py-2">Biography</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Fantasy" class="btn btn-outline-primary rounded-pill px-4 py-2">Fantasy</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Mystery" class="btn btn-outline-danger rounded-pill px-4 py-2">Mystery</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Children" class="btn btn-outline-success rounded-pill px-4 py-2">Children</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Poetry" class="btn btn-outline-secondary rounded-pill px-4 py-2">Poetry</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Novel" class="btn btn-outline-success rounded-pill px-4 py-2">Novel</a>
+            <a asp-controller="Library" asp-action="Index" asp-route-genre="Self Help" class="btn btn-outline-secondary rounded-pill px-4 py-2">Self Help</a>
+        </div>
+    }
+</div>

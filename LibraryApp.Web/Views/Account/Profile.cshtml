@@ -1,0 +1,112 @@
+@model LibraryApp.Models.User
+
+@{
+    ViewData["Title"] = "My Profile";
+
+    var username = Context.Session.GetString("username");
+    var userType = Context.Session.GetString("user_type");
+
+    var borrowedBooks = ViewBag.BorrowedBooks as List<LibraryApp.Models.Book>;
+    var returnedBooks = ViewBag.ReturnedBooks as List<LibraryApp.Models.Book>;    
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-3">
+        <div class="card-body">
+            <h2 class="text-center mb-4 text-primary">👤 My Profile</h2>
+
+            <div class="row mb-3">
+                <div class="col-md-4"><strong>Full Name:</strong></div>
+                <div class="col-md-8">@Model.FullName</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4"><strong>Username:</strong></div>
+                <div class="col-md-8">@Model.Username</div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-4"><strong>User Type:</strong></div>
+                <div class="col-md-8">@Model.UserType</div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-12 text-end">
+                    <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-warning">
+                        Change Password
+                    </a>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(username) && (userType == "Library User")){
+            <h4 class="text-secondary mt-4 mb-3">📚 Borrowed Books</h4>
+            @if (borrowedBooks != null && borrowedBooks.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Page</th>
+                                <th>Operation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var book in borrowedBooks)
+                            {
+                                <tr>
+                                    <td>@book.Name</td>
+                                    <td>@book.Author</td>
+                                    <td>@book.Genre</td>
+                                    <td>@book.Page_number</td>
+                                    <td>
+                                        <form method="post" asp-action="DeliverBook" asp-controller="Library">
+                                            <input type="hidden" name="bookName" value="@book.Name" />
+                                            <button type="submit" class="btn btn-sm btn-danger">Deliver</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">You have not borrowed any books yet.</p>
+            }
+            
+            <h4 class="text-secondary mt-4 mb-3">✅ Returned Books</h4>
+                @if (returnedBooks != null && returnedBooks.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Author</th>
+                                    <th>Category</th>
+                                    <th>Page</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var book in returnedBooks)
+                                {
+                                    <tr>
+                                        <td>@book.Name</td>
+                                        <td>@book.Author</td>
+                                        <td>@book.Genre</td>
+                                        <td>@book.Page_number</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">You have not returned any books yet.</p>
+                }
+            }
+        </div>
+    </div>
+</div>

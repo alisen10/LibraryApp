@@ -1,0 +1,37 @@
+@model LibraryApp.Models.Book
+
+@{
+    ViewData["Title"] = "Loan Book";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">📚 Loan Book</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["UserOrBookNotFoundError"] != null)
+    {
+        <div class="alert alert-danger">@TempData["UserOrBookNotFoundError"]</div>
+    }
+    @if (TempData["UserTypeError"] != null)
+    {
+        <div class="alert alert-danger">@TempData["UserTypeError"]</div>
+    }
+
+    <form asp-action="LoanBook" asp-controller="Library" method="post" class="w-50 mx-auto">
+        <input type="hidden" name="bookName" value="@Model.Name" />
+
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" name="username" id="username" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Loan Book</button>
+    </form>
+</div>

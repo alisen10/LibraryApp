@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+
+*.user
+*.suo
+
+LibraryApp.Web/appsettings.json
+LibraryApp.Web/appsettings.Development.json
+
+LibraryApp.Web/Properties/launchSettings.json
+
+LibraryApp.Web/wwwroot/lib/
